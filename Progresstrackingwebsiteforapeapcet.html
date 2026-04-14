@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sripa AP EAPCET</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#00d4ff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Sripa EAPCET">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Nunito:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<style>
+  :root {
+    --bg: #0a0f1e;
+    --surface: #111827;
+    --card: #1a2236;
+    --border: #1e3a5f;
+    --accent: #00d4ff;
+    --accent2: #7c3aed;
+    --accent3: #10b981;
+    --warn: #f59e0b;
+    --danger: #ef4444;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --font-head: 'Rajdhani', sans-serif;
+    --font-body: 'Nunito', sans-serif;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ─── BG GRID ─── */
+  body::before {
+    content:'';
+    position:fixed;
+    inset:0;
+    background-image:
+      linear-gradient(rgba(0,212,255,.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events:none;
+    z-index:0;
+  }
+
+  /* ─── SCREENS ─── */
+  .screen { display:none; min-height:100vh; position:relative; z-index:1; animation: fadeIn .4s ease; }
+  .screen.active { display:flex; flex-direction:column; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:none} }
+
+  /* ─── TOPBAR ─── */
+  .topbar {
+    background: rgba(17,24,39,.9);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 20px;
+    display:flex; align-items:center; justify-content:space-between;
+    position:sticky; top:0; z-index:100;
+  }
+  .logo { font-family:var(--font-head); font-size:1.4rem; font-weight:700; letter-spacing:.5px; }
+  .logo span { color:var(--accent); }
+  .user-chip {
+    display:flex; align-items:center; gap:8px;
+    background:var(--card); border:1px solid var(--border);
+    padding:6px 12px; border-radius:20px; font-size:.8rem; cursor:pointer;
+  }
+  .avatar { width:26px; height:26px; border-radius:50%; background:linear-gradient(135deg,var(--accent),var(--accent2)); display:grid; place-items:center; font-size:.7rem; font-weight:700; }
+
+  /* ─── AUTH ─── */
+  .auth-wrap {
+    flex:1; display:flex; align-items:center; justify-content:center; padding:20px;
+  }
+  .auth-box {
+    width:100%; max-width:460px;
+    background:var(--card); border:1px solid var(--border);
+    border-radius:20px; padding:36px 32px;
+    box-shadow: 0 0 60px rgba(0,212,255,.07);
+  }
+  .auth-title { font-family:var(--font-head); font-size:2rem; font-weight:700; margin-bottom:4px; }
+  .auth-title span { color:var(--accent); }
+  .auth-sub { color:var(--muted); font-size:.9rem; margin-bottom:28px; }
+  .tab-row { display:flex; gap:8px; margin-bottom:24px; }
+  .tab-btn {
+    flex:1; padding:10px; border-radius:10px; border:1px solid var(--border);
+    background:transparent; color:var(--muted); font-family:var(--font-body); font-size:.9rem;
+    cursor:pointer; transition:.2s;
+  }
+  .tab-btn.active { background:var(--accent); border-color:var(--accent); color:#000; font-weight:700; }
+
+  /* ─── FORM ─── */
+  .field { margin-bottom:16px; }
+  .field label { display:block; font-size:.8rem; color:var(--muted); margin-bottom:6px; text-transform:uppercase; letter-spacing:.5px; }
+  .field input, .field select, .field textarea {
+    width:100%; padding:12px 14px;
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:10px; color:var(--text); font-family:var(--font-body); font-size:.95rem;
+    outline:none; transition:.2s;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    border-color:var(--accent); box-shadow:0 0 0 3px rgba(0,212,255,.1);
+  }
+  .field textarea { resize:vertical; min-height:80px; }
+
+  .btn {
+    width:100%; padding:13px; border-radius:12px; border:none; cursor:pointer;
+    font-family:var(--font-body); font-size:1rem; font-weight:700; transition:.2s;
+  }
+  .btn-primary { background:var(--accent); color:#000; }
+  .btn-primary:hover { background:#00b8d9; transform:translateY(-1px); }
+  .btn-secondary { background:var(--card); color:var(--text); border:1px solid var(--border); }
+  .btn-secondary:hover { border-color:var(--accent); color:var(--accent); }
+  .btn-danger { background:var(--danger); color:#fff; }
+  .btn-warn { background:var(--warn); color:#000; }
+  .btn-green { background:var(--accent3); color:#000; }
+  .btn-purple { background:var(--accent2); color:#fff; }
+  .btn-sm { padding:8px 16px; width:auto; font-size:.85rem; border-radius:8px; }
+
+  .otp-row { display:flex; gap:8px; }
+  .otp-row input { flex:1; text-align:center; font-size:1.1rem; letter-spacing:2px; }
+  .otp-row .btn { width:auto; padding:12px 20px; border-radius:10px; white-space:nowrap; }
+
+  .alert { padding:10px 14px; border-radius:8px; font-size:.85rem; margin-bottom:12px; display:none; }
+  .alert.error { background:rgba(239,68,68,.15); border:1px solid rgba(239,68,68,.3); color:#fca5a5; }
+  .alert.success { background:rgba(16,185,129,.15); border:1px solid rgba(16,185,129,.3); color:#6ee7b7; }
+  .alert.info { background:rgba(0,212,255,.1); border:1px solid rgba(0,212,255,.2); color:var(--accent); }
+  .alert.show { display:block; }
+
+  /* ─── NAV ─── */
+  .bottom-nav {
+    position:fixed; bottom:0; left:0; right:0;
+    background:rgba(17,24,39,.95);
+    backdrop-filter:blur(16px);
+    border-top:1px solid var(--border);
+    display:flex; z-index:200;
+  }
+  .nav-item {
+    flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;
+    padding:10px 4px 14px; cursor:pointer; border:none; background:none;
+    color:var(--muted); font-family:var(--font-body); font-size:.65rem; transition:.2s;
+  }
+  .nav-item svg { width:22px; height:22px; }
+  .nav-item.active { color:var(--accent); }
+  .nav-item.active svg { filter:drop-shadow(0 0 6px var(--accent)); }
+
+  /* ─── CONTENT ─── */
+  .content { flex:1; padding:20px 16px 90px; max-width:700px; margin:0 auto; width:100%; }
+
+  /* ─── CARDS ─── */
+  .card {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:16px; padding:20px; margin-bottom:16px;
+  }
+  .card-title { font-family:var(--font-head); font-size:1.1rem; font-weight:600; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+  .badge {
+    padding:3px 10px; border-radius:20px; font-size:.72rem; font-weight:700;
+    display:inline-block;
+  }
+  .badge-accent { background:rgba(0,212,255,.15); color:var(--accent); border:1px solid rgba(0,212,255,.2); }
+  .badge-green { background:rgba(16,185,129,.15); color:var(--accent3); border:1px solid rgba(16,185,129,.2); }
+  .badge-warn { background:rgba(245,158,11,.15); color:var(--warn); border:1px solid rgba(245,158,11,.2); }
+  .badge-danger { background:rgba(239,68,68,.15); color:var(--danger); border:1px solid rgba(239,68,68,.2); }
+
+  /* ─── STAT GRID ─── */
+  .stat-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
+  .stat-box {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:14px; padding:16px; text-align:center;
+  }
+  .stat-num { font-family:var(--font-head); font-size:2rem; font-weight:700; line-height:1; }
+  .stat-lbl { font-size:.72rem; color:var(--muted); margin-top:4px; text-transform:uppercase; letter-spacing:.5px; }
+
+  /* ─── RANK DISPLAY ─── */
+  .rank-card {
+    background: linear-gradient(135deg, rgba(124,58,237,.2), rgba(0,212,255,.1));
+    border:1px solid rgba(124,58,237,.4);
+    border-radius:16px; padding:24px; text-align:center; margin-bottom:16px;
+  }
+  .rank-num { font-family:var(--font-head); font-size:3.5rem; font-weight:700; color:var(--accent); line-height:1; }
+  .rank-range { font-size:.85rem; color:var(--muted); margin-top:6px; }
+
+  /* ─── EXAM LIST ─── */
+  .exam-item {
+    display:flex; align-items:center; gap:12px;
+    padding:12px 14px; background:var(--surface);
+    border:1px solid var(--border); border-radius:12px; margin-bottom:8px;
+  }
+  .exam-score { font-family:var(--font-head); font-size:1.4rem; font-weight:700; min-width:50px; text-align:center; }
+  .exam-meta { flex:1; }
+  .exam-date { font-size:.75rem; color:var(--muted); }
+  .exam-subj { font-size:.85rem; font-weight:600; }
+
+  /* ─── ROUTINE ─── */
+  .routine-slot {
+    display:flex; gap:10px; align-items:flex-start;
+    padding:10px 0; border-bottom:1px solid rgba(30,58,95,.5);
+  }
+  .slot-time { font-size:.75rem; color:var(--accent); min-width:50px; font-family:var(--font-head); }
+  .slot-act { flex:1; font-size:.9rem; }
+
+  /* ─── PROGRESS ─── */
+  .prog-bar-wrap { background:rgba(0,212,255,.08); border-radius:20px; height:8px; overflow:hidden; margin:8px 0; }
+  .prog-bar { height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:20px; transition:width .6s ease; }
+
+  /* ─── MODAL ─── */
+  .modal-overlay {
+    position:fixed; inset:0; background:rgba(0,0,0,.7);
+    backdrop-filter:blur(6px); z-index:500;
+    display:none; align-items:center; justify-content:center; padding:20px;
+  }
+  .modal-overlay.open { display:flex; }
+  .modal {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:20px; padding:28px; width:100%; max-width:460px;
+    animation:fadeIn .3s ease;
+  }
+  .modal-title { font-family:var(--font-head); font-size:1.3rem; font-weight:700; margin-bottom:18px; }
+  .modal-close { float:right; cursor:pointer; color:var(--muted); font-size:1.3rem; line-height:1; }
+
+  /* ─── TIMETABLE ─── */
+  .tt-row { display:flex; gap:8px; align-items:center; margin-bottom:8px; flex-wrap:wrap; }
+  .tt-day { background:var(--accent); color:#000; font-weight:700; font-size:.75rem; padding:4px 10px; border-radius:6px; min-width:36px; text-align:center; }
+  .tt-subject { flex:1; font-size:.85rem; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:8px 10px; }
+
+  /* ─── REASON MODAL ─── */
+  #reason-modal .field textarea { min-height:100px; }
+
+  /* ─── SECTION HEADER ─── */
+  .sec-hdr { font-family:var(--font-head); font-size:1.4rem; font-weight:700; margin-bottom:16px; display:flex; align-items:center; gap:10px; }
+
+  /* ─── GLOW BTN ─── */
+  .glow { box-shadow:0 0 20px rgba(0,212,255,.3); }
+
+  /* ─── SCROLLABLE LIST ─── */
+  .scroll-list { max-height:340px; overflow-y:auto; padding-right:4px; }
+  .scroll-list::-webkit-scrollbar { width:4px; }
+  .scroll-list::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
+
+  .tag { display:inline-block; padding:2px 8px; border-radius:4px; font-size:.7rem; font-weight:700; margin-left:6px; }
+  .tag-absent { background:rgba(239,68,68,.2); color:var(--danger); }
+  .tag-present { background:rgba(16,185,129,.2); color:var(--accent3); }
+
+  .divider { height:1px; background:var(--border); margin:16px 0; }
+
+  .welcome-text { font-size:.9rem; color:var(--muted); }
+  .greeting { font-family:var(--font-head); font-size:1.6rem; font-weight:700; }
+
+  @media(max-width:400px) { .stat-grid { grid-template-columns:1fr 1fr; } }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════ AUTH SCREEN ══════════════════ -->
+<div class="screen active" id="screen-auth">
+  <div class="auth-wrap">
+    <div class="auth-box">
+      <div class="auth-title">Sripa <span style="color:var(--accent2)">EAPCET</span></div>
+      <div class="auth-sub">AP EAPCET Preparation Monitoring System</div>
+      <div class="tab-row">
+        <button class="tab-btn active" onclick="authTab('login')">Login</button>
+        <button class="tab-btn" onclick="authTab('register')">Register</button>
+      </div>
+      <div class="alert" id="auth-alert"></div>
+
+      <!-- LOGIN -->
+      <div id="auth-login">
+        <div class="field"><label>Gmail ID</label><input type="email" id="l-email" placeholder="student@gmail.com"></div>
+        <div class="field"><label>Password</label><input type="password" id="l-pass" placeholder="••••••••"></div>
+        <button class="btn btn-primary glow" onclick="doLogin()">🚀 Login</button>
+      </div>
+
+      <!-- REGISTER -->
+      <div id="auth-register" style="display:none">
+        <div class="field"><label>Full Name</label><input type="text" id="r-name" placeholder="Your full name"></div>
+        <div class="field"><label>Gmail ID</label><input type="email" id="r-email" placeholder="student@gmail.com"></div>
+        <div class="field"><label>Password</label><input type="password" id="r-pass" placeholder="Min 6 characters"></div>
+        <div class="divider"></div>
+        <div style="font-size:.8rem;color:var(--accent);margin-bottom:12px;font-weight:600;">👨‍👩‍👦 Guardian Details</div>
+        <div class="field"><label>Guardian Name</label><input type="text" id="r-gname" placeholder="Parent / Guardian name"></div>
+        <div class="field"><label>Guardian Gmail</label><input type="email" id="r-gemail" placeholder="guardian@gmail.com"></div>
+        <div class="field">
+          <label>Verify Guardian Gmail</label>
+          <div class="otp-row">
+            <input type="text" id="r-otp" placeholder="Enter OTP" maxlength="6">
+            <button class="btn btn-secondary" onclick="sendOTP()">Send OTP</button>
+          </div>
+        </div>
+        <button class="btn btn-primary glow" onclick="doRegister()" style="margin-top:4px">✅ Create Account</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ MAIN APP ══════════════════ -->
+<div class="screen" id="screen-app">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="logo">Sripa EAPCET</div>
+    <div class="user-chip" onclick="showLogout()">
+      <div class="avatar" id="avatar-init">S</div>
+      <span id="topbar-name">Student</span>
+      <span style="font-size:.7rem;color:var(--muted)">▾</span>
+    </div>
+  </div>
+
+  <!-- TAB PANELS -->
+  <div class="content" id="tab-home" style="display:block">
+    <div class="greeting">Good <span id="greeting-time">Morning</span> ☀️</div>
+    <div class="welcome-text" id="welcome-name" style="margin-bottom:20px"></div>
+
+    <!-- Today Progress -->
+    <div class="card">
+      <div class="card-title">📅 Today's Progress</div>
+      <div class="stat-grid">
+        <div class="stat-box">
+          <div class="stat-num" id="today-exams" style="color:var(--accent)">0</div>
+          <div class="stat-lbl">Exams Done</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="today-avg" style="color:var(--accent3)">—</div>
+          <div class="stat-lbl">Avg Score</div>
+        </div>
+      </div>
+      <div style="font-size:.8rem;color:var(--muted);margin-bottom:6px">Target: 2 Exams / Day</div>
+      <div class="prog-bar-wrap"><div class="prog-bar" id="today-prog" style="width:0%"></div></div>
+      <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+        <button class="btn btn-primary btn-sm" onclick="openExamModal()">📝 Log Exam</button>
+        <button class="btn btn-secondary btn-sm" onclick="openRoutineModal()">📋 Log Routine</button>
+        <button class="btn btn-warn btn-sm" style="width:auto" onclick="markAbsent()">⚠️ Mark Absent</button>
+      </div>
+    </div>
+
+    <!-- Latest Rank Prediction -->
+    <div class="rank-card" id="rank-preview">
+      <div style="font-size:.8rem;color:var(--muted);margin-bottom:4px">PREDICTED AP EAPCET RANK</div>
+      <div class="rank-num" id="rank-display">—</div>
+      <div class="rank-range" id="rank-range">Enter exam marks to get prediction</div>
+    </div>
+
+    <!-- Reminder Status -->
+    <div class="card">
+      <div class="card-title">🔔 Reminders</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:.9rem">Morning Reminder (9:00 AM)</span>
+          <span class="badge badge-green">Active</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:.9rem">Evening Check (9:00 PM)</span>
+          <span class="badge badge-green">Active</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:.9rem">Guardian Report (10:00 PM)</span>
+          <span class="badge badge-accent">Scheduled</span>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="requestNotifPerms()" style="margin-top:4px">Enable Browser Notifications</button>
+      </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="card">
+      <div class="card-title">📊 All-Time Stats</div>
+      <div class="stat-grid">
+        <div class="stat-box">
+          <div class="stat-num" id="total-exams" style="color:var(--accent2)">0</div>
+          <div class="stat-lbl">Total Exams</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="best-score" style="color:var(--warn)">0</div>
+          <div class="stat-lbl">Best Score</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="absent-count" style="color:var(--danger)">0</div>
+          <div class="stat-lbl">Absent Days</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="streak-count" style="color:var(--accent3)">0</div>
+          <div class="stat-lbl">Day Streak</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content" id="tab-exams" style="display:none">
+    <div class="sec-hdr">📝 Exam Results <span class="badge badge-accent" id="exam-count-badge">0</span></div>
+    <div class="card">
+      <button class="btn btn-primary btn-sm" onclick="openExamModal()" style="margin-bottom:12px">+ Add Exam Result</button>
+      <div class="scroll-list" id="exam-list-container">
+        <div style="text-align:center;color:var(--muted);padding:30px">No exams recorded yet.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content" id="tab-routine" style="display:none">
+    <div class="sec-hdr">🗓️ Routine & Timetable</div>
+
+    <!-- Timetable -->
+    <div class="card">
+      <div class="card-title">📅 Weekly Timetable</div>
+      <div id="tt-list"></div>
+      <button class="btn btn-secondary btn-sm" onclick="openTimetableModal()" style="margin-top:4px">✏️ Edit Timetable</button>
+    </div>
+
+    <!-- Day Routines -->
+    <div class="card">
+      <div class="card-title">📋 Daily Activity Log</div>
+      <div class="scroll-list" id="routine-log-list">
+        <div style="text-align:center;color:var(--muted);padding:20px">No routines logged.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content" id="tab-reports" style="display:none">
+    <div class="sec-hdr">📈 Reports & Rank Tracker</div>
+
+    <!-- Manual Rank Check -->
+    <div class="card">
+      <div class="card-title">🎯 AP EAPCET Rank Predictor</div>
+      <div style="font-size:.82rem;color:var(--muted);margin-bottom:12px">Enter your practice test score (out of 160) to predict your rank based on previous years' AP EAPCET data.</div>
+      <div class="field"><label>Your Score (out of 160)</label><input type="number" id="pred-score" placeholder="e.g. 112" min="0" max="160"></div>
+      <div class="field"><label>Stream</label>
+        <select id="pred-stream">
+          <option value="MPC">MPC (Maths, Physics, Chemistry)</option>
+          <option value="BiPC">BiPC (Biology, Physics, Chemistry)</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" onclick="predictRank()">🔮 Predict My Rank</button>
+      <div class="rank-card" id="pred-result" style="display:none;margin-top:16px">
+        <div style="font-size:.8rem;color:var(--muted);margin-bottom:4px">PREDICTED RANK</div>
+        <div class="rank-num" id="pred-rank-num">—</div>
+        <div class="rank-range" id="pred-rank-range"></div>
+        <div id="pred-college-hint" style="font-size:.8rem;color:var(--accent3);margin-top:8px"></div>
+      </div>
+    </div>
+
+    <!-- Rank History Chart (text-based) -->
+    <div class="card">
+      <div class="card-title">📉 Score History</div>
+      <div id="score-history-list">
+        <div style="text-align:center;color:var(--muted);padding:20px">No history yet.</div>
+      </div>
+    </div>
+
+    <!-- Reasons Log -->
+    <div class="card">
+      <div class="card-title">📝 Missed Day Reasons</div>
+      <div class="scroll-list" id="reasons-list">
+        <div style="text-align:center;color:var(--muted);padding:20px">No missed day reasons.</div>
+      </div>
+    </div>
+
+    <!-- Send Report -->
+    <div class="card">
+      <div class="card-title">📧 Send Report to Guardian</div>
+      <button class="btn btn-green" onclick="sendGuardianReport()">📨 Send Today's Report Now</button>
+      <div class="alert" id="mail-alert" style="margin-top:12px"></div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav">
+    <button class="nav-item active" onclick="switchTab('home',this)">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      Home
+    </button>
+    <button class="nav-item" onclick="switchTab('exams',this)">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/></svg>
+      Exams
+    </button>
+    <button class="nav-item" onclick="switchTab('routine',this)">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
+      Routine
+    </button>
+    <button class="nav-item" onclick="switchTab('reports',this)">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg>
+      Reports
+    </button>
+  </div>
+</div>
+
+<!-- ══════ MODALS ══════ -->
+
+<!-- LOG EXAM MODAL -->
+<div class="modal-overlay" id="exam-modal">
+  <div class="modal">
+    <span class="modal-close" onclick="closeModal('exam-modal')">✕</span>
+    <div class="modal-title">📝 Log Exam</div>
+    <div class="field"><label>Score (out of 160)</label><input type="number" id="ex-score" placeholder="e.g. 118" min="0" max="160"></div>
+    <div class="field"><label>Subject / Test Name</label><input type="text" id="ex-name" placeholder="e.g. Full Mock Test 1 / Physics"></div>
+    <div class="field"><label>Date & Time</label><input type="datetime-local" id="ex-datetime"></div>
+    <div class="field"><label>Stream</label>
+      <select id="ex-stream"><option value="MPC">MPC</option><option value="BiPC">BiPC</option></select>
+    </div>
+    <div class="field"><label>Notes (optional)</label><input type="text" id="ex-notes" placeholder="Weak areas, remarks..."></div>
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <button class="btn btn-primary" onclick="saveExam()">✅ Save Exam</button>
+      <button class="btn btn-secondary" onclick="closeModal('exam-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOG ROUTINE MODAL -->
+<div class="modal-overlay" id="routine-modal">
+  <div class="modal">
+    <span class="modal-close" onclick="closeModal('routine-modal')">✕</span>
+    <div class="modal-title">📋 Log Today's Routine</div>
+    <div class="field"><label>Time</label><input type="time" id="rt-time"></div>
+    <div class="field"><label>Activity</label><input type="text" id="rt-act" placeholder="e.g. Studied Maths Integrals, Lunch, Exercise"></div>
+    <div class="field"><label>Duration (minutes)</label><input type="number" id="rt-dur" placeholder="e.g. 60"></div>
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <button class="btn btn-primary" onclick="saveRoutine()">✅ Add Activity</button>
+      <button class="btn btn-secondary" onclick="closeModal('routine-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- TIMETABLE MODAL -->
+<div class="modal-overlay" id="tt-modal">
+  <div class="modal">
+    <span class="modal-close" onclick="closeModal('tt-modal')">✕</span>
+    <div class="modal-title">📅 Edit Weekly Timetable</div>
+    <div id="tt-inputs"></div>
+    <button class="btn btn-primary" onclick="saveTimetable()" style="margin-top:12px">✅ Save Timetable</button>
+  </div>
+</div>
+
+<!-- REASON MODAL -->
+<div class="modal-overlay" id="reason-modal">
+  <div class="modal">
+    <span class="modal-close" onclick="closeModal('reason-modal')">✕</span>
+    <div class="modal-title">⚠️ Why couldn't you complete 2 exams today?</div>
+    <div class="field"><label>Your Reason</label><textarea id="reason-text" placeholder="Be honest, your guardian will see this..."></textarea></div>
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <button class="btn btn-warn" onclick="saveReason()">📨 Submit Reason</button>
+      <button class="btn btn-secondary" onclick="closeModal('reason-modal')">Skip</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGOUT CONFIRM -->
+<div class="modal-overlay" id="logout-modal">
+  <div class="modal">
+    <div class="modal-title">👋 Logout?</div>
+    <p style="color:var(--muted);margin-bottom:18px;font-size:.9rem">Are you sure you want to logout?</p>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-danger" onclick="doLogout()">Logout</button>
+      <button class="btn btn-secondary" onclick="closeModal('logout-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+// EMAILJS CONFIG — fill these after signing up at emailjs.com (FREE)
+// ══════════════════════════════════════════════
+const EMAILJS_PUBLIC_KEY = "YOUR_EMAILJS_PUBLIC_KEY";
+const EMAILJS_SERVICE_ID = "YOUR_SERVICE_ID";
+const EMAILJS_TEMPLATE_ID = "YOUR_TEMPLATE_ID";
+// ══════════════════════════════════════════════
+
+// ─── STATE ───
+let currentUser = null;
+let otpSent = null;
+
+// ─── INIT ───
+window.onload = () => {
+  emailjs.init(EMAILJS_PUBLIC_KEY);
+  const saved = localStorage.getItem('sripa_user');
+  if (saved) {
+    currentUser = JSON.parse(saved);
+    enterApp();
+  }
+  setGreeting();
+  scheduleDailyChecks();
+};
+
+function setGreeting() {
+  const h = new Date().getHours();
+  const t = h < 12 ? 'Morning' : h < 17 ? 'Afternoon' : 'Evening';
+  const el = document.getElementById('greeting-time');
+  if (el) el.textContent = t;
+}
+
+// ─── AUTH ───
+function authTab(tab) {
+  document.getElementById('auth-login').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('auth-register').style.display = tab === 'register' ? 'block' : 'none';
+  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', (tab==='login'&&i===0)||(tab==='register'&&i===1)));
+}
+
+function showAuthAlert(msg, type='error') {
+  const el = document.getElementById('auth-alert');
+  el.textContent = msg; el.className = `alert ${type} show`;
+  setTimeout(() => el.classList.remove('show'), 4000);
+}
+
+function doLogin() {
+  const email = v('l-email'), pass = v('l-pass');
+  if (!email || !pass) return showAuthAlert('Please fill all fields.');
+  const users = JSON.parse(localStorage.getItem('sripa_users') || '{}');
+  if (!users[email]) return showAuthAlert('Account not found. Please register.');
+  if (users[email].password !== btoa(pass)) return showAuthAlert('Incorrect password.');
+  currentUser = users[email];
+  localStorage.setItem('sripa_user', JSON.stringify(currentUser));
+  enterApp();
+}
+
+function sendOTP() {
+  const gemail = v('r-gemail');
+  if (!gemail || !gemail.includes('@gmail.com')) return showAuthAlert('Enter valid guardian Gmail.');
+  otpSent = Math.floor(100000 + Math.random() * 900000).toString();
+  // In production send via EmailJS; for now show in alert
+  showAuthAlert(`OTP for demo: ${otpSent} (In production this will be emailed to guardian)`, 'info');
+}
+
+function doRegister() {
+  const name=v('r-name'), email=v('r-email'), pass=v('r-pass');
+  const gname=v('r-gname'), gemail=v('r-gemail'), otp=v('r-otp');
+  if (!name||!email||!pass||!gname||!gemail) return showAuthAlert('Please fill all fields.');
+  if (!email.includes('@gmail.com')) return showAuthAlert('Use a valid Gmail ID.');
+  if (pass.length < 6) return showAuthAlert('Password must be at least 6 characters.');
+  if (!otpSent) return showAuthAlert('Please send OTP first to verify guardian Gmail.');
+  if (otp !== otpSent) return showAuthAlert('Invalid OTP. Please try again.');
+  const users = JSON.parse(localStorage.getItem('sripa_users') || '{}');
+  if (users[email]) return showAuthAlert('Account already exists. Please login.');
+  const user = { name, email, password: btoa(pass), gname, gemail, createdAt: Date.now() };
+  users[email] = user;
+  localStorage.setItem('sripa_users', JSON.stringify(users));
+  currentUser = user;
+  localStorage.setItem('sripa_user', JSON.stringify(currentUser));
+  showAuthAlert('Account created! Welcome 🎉', 'success');
+  setTimeout(enterApp, 1000);
+}
+
+function enterApp() {
+  document.getElementById('screen-auth').classList.remove('active');
+  document.getElementById('screen-app').classList.add('active');
+  document.getElementById('topbar-name').textContent = currentUser.name.split(' ')[0];
+  document.getElementById('avatar-init').textContent = currentUser.name[0].toUpperCase();
+  document.getElementById('welcome-name').textContent = `${currentUser.name} · ${currentUser.email}`;
+  setGreeting();
+  refreshHome();
+  renderExamList();
+  renderRoutineList();
+  renderTimetableView();
+  renderReasonsLog();
+  renderScoreHistory();
+  requestNotifPerms();
+}
+
+// ─── LOGOUT ───
+function showLogout() { openModal('logout-modal'); }
+function doLogout() {
+  currentUser = null;
+  localStorage.removeItem('sripa_user');
+  closeModal('logout-modal');
+  document.getElementById('screen-app').classList.remove('active');
+  document.getElementById('screen-auth').classList.add('active');
+}
+
+// ─── NAV ───
+function switchTab(tab, btn) {
+  ['home','exams','routine','reports'].forEach(t => {
+    document.getElementById(`tab-${t}`).style.display = t===tab ? 'block' : 'none';
+  });
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (tab==='reports') { renderReasonsLog(); renderScoreHistory(); }
+  if (tab==='exams') renderExamList();
+  if (tab==='routine') { renderRoutineList(); renderTimetableView(); }
+}
+
+// ─── MODALS ───
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// ─── EXAM ───
+function openExamModal() {
+  const now = new Date();
+  const local = new Date(now - now.getTimezoneOffset()*60000).toISOString().slice(0,16);
+  document.getElementById('ex-datetime').value = local;
+  openModal('exam-modal');
+}
+
+function saveExam() {
+  const score = parseInt(v('ex-score'));
+  if (isNaN(score)||score<0||score>160) return alert('Enter valid score (0-160)');
+  const exam = {
+    id: Date.now(),
+    score,
+    name: v('ex-name') || 'Practice Test',
+    datetime: v('ex-datetime') || new Date().toISOString(),
+    stream: v('ex-stream') || 'MPC',
+    notes: v('ex-notes') || '',
+    date: new Date().toDateString()
+  };
+  const exams = getExams();
+  if (exams.length >= 300) { alert('300 exam limit reached! Delete older records.'); return; }
+  exams.unshift(exam);
+  saveExams(exams);
+  closeModal('exam-modal');
+  refreshHome();
+  renderExamList();
+  renderScoreHistory();
+  // Auto-predict rank
+  const rank = calcRank(score, exam.stream);
+  document.getElementById('rank-display').textContent = formatRank(rank.mid);
+  document.getElementById('rank-range').textContent = `Estimated range: ${formatRank(rank.low)} – ${formatRank(rank.high)}`;
+}
+
+function markAbsent() {
+  const today = new Date().toDateString();
+  const absents = JSON.parse(localStorage.getItem(`sripa_absents_${currentUser.email}`) || '[]');
+  if (absents.includes(today)) return alert('Already marked absent for today.');
+  absents.push(today);
+  localStorage.setItem(`sripa_absents_${currentUser.email}`, JSON.stringify(absents));
+  refreshHome();
+  alert('Marked as absent for today.');
+}
+
+function getExams() { return JSON.parse(localStorage.getItem(`sripa_exams_${currentUser.email}`) || '[]'); }
+function saveExams(e) { localStorage.setItem(`sripa_exams_${currentUser.email}`, JSON.stringify(e)); }
+
+function renderExamList() {
+  const exams = getExams();
+  const cnt = document.getElementById('exam-count-badge');
+  if (cnt) cnt.textContent = exams.length;
+  const container = document.getElementById('exam-list-container');
+  if (!container) return;
+  if (!exams.length) { container.innerHTML = '<div style="text-align:center;color:var(--muted);padding:30px">No exams recorded yet.</div>'; return; }
+  container.innerHTML = exams.map(e => {
+    const pct = Math.round((e.score/160)*100);
+    const col = pct>=70?'var(--accent3)':pct>=50?'var(--warn)':'var(--danger)';
+    return `<div class="exam-item">
+      <div class="exam-score" style="color:${col}">${e.score}</div>
+      <div class="exam-meta">
+        <div class="exam-subj">${e.name} <span class="badge badge-accent">${e.stream}</span></div>
+        <div class="exam-date">${new Date(e.datetime).toLocaleString()} · ${pct}%</div>
+        ${e.notes ? `<div style="font-size:.75rem;color:var(--muted);margin-top:2px">${e.notes}</div>` : ''}
+      </div>
+      <button class="btn btn-secondary btn-sm" onclick="deleteExam(${e.id})" style="color:var(--danger);border-color:var(--danger)">🗑</button>
+    </div>`;
+  }).join('');
+}
+
+function deleteExam(id) {
+  if (!confirm('Delete this exam result?')) return;
+  saveExams(getExams().filter(e => e.id !== id));
+  renderExamList(); refreshHome(); renderScoreHistory();
+}
+
+// ─── RANK PREDICTION (AP EAPCET Historical Data Formula) ───
+// Based on official AP EAPCET cutoffs 2019-2024:
+// Score 150-160 → Rank ~1-200
+// Score 140-149 → Rank ~200-800
+// Score 130-139 → Rank ~800-3000
+// Score 120-129 → Rank ~3000-8000
+// Score 110-119 → Rank ~8000-18000
+// Score 100-109 → Rank ~18000-35000
+// Score 90-99  → Rank ~35000-60000
+// Score 80-89  → Rank ~60000-90000
+// Score 70-79  → Rank ~90000-130000
+// Score 60-69  → Rank ~130000-180000
+// Score 50-59  → Rank ~180000-230000
+// Score 40-49  → Rank ~230000-280000
+// Score <40    → Rank ~280000+
+function calcRank(score, stream) {
+  const bipcMult = stream === 'BiPC' ? 0.6 : 1; // BiPC has fewer candidates in MPC-equivalent
+  const bands = [
+    {min:155,max:160,lo:1,hi:100},
+    {min:150,max:154,lo:100,hi:300},
+    {min:145,max:149,lo:300,hi:700},
+    {min:140,max:144,lo:700,hi:1500},
+    {min:135,max:139,lo:1500,hi:3500},
+    {min:130,max:134,lo:3500,hi:6000},
+    {min:125,max:129,lo:6000,hi:10000},
+    {min:120,max:124,lo:10000,hi:15000},
+    {min:115,max:119,lo:15000,hi:22000},
+    {min:110,max:114,lo:22000,hi:30000},
+    {min:105,max:109,lo:30000,hi:42000},
+    {min:100,max:104,lo:42000,hi:55000},
+    {min:95,max:99,lo:55000,hi:70000},
+    {min:90,max:94,lo:70000,hi:85000},
+    {min:85,max:89,lo:85000,hi:100000},
+    {min:80,max:84,lo:100000,hi:115000},
+    {min:75,max:79,lo:115000,hi:135000},
+    {min:70,max:74,lo:135000,hi:155000},
+    {min:65,max:69,lo:155000,hi:175000},
+    {min:60,max:64,lo:175000,hi:195000},
+    {min:50,max:59,lo:195000,hi:220000},
+    {min:40,max:49,lo:220000,hi:255000},
+    {min:0,max:39,lo:255000,hi:300000},
+  ];
+  for (const b of bands) {
+    if (score >= b.min && score <= b.max) {
+      const range = b.max - b.min || 1;
+      const pos = (b.max - score) / range;
+      const mid = Math.round((b.lo + (b.hi-b.lo)*pos) * bipcMult);
+      return { low: Math.round(b.lo*bipcMult), mid, high: Math.round(b.hi*bipcMult) };
+    }
+  }
+  return { low: 290000, mid: 295000, high: 300000 };
+}
+
+function formatRank(n) { return n.toLocaleString('en-IN'); }
+
+function predictRank() {
+  const score = parseInt(document.getElementById('pred-score').value);
+  const stream = document.getElementById('pred-stream').value;
+  if (isNaN(score)||score<0||score>160) return alert('Enter valid score 0–160');
+  const rank = calcRank(score, stream);
+  document.getElementById('pred-rank-num').textContent = formatRank(rank.mid);
+  document.getElementById('pred-rank-range').textContent = `Range: ${formatRank(rank.low)} – ${formatRank(rank.high)}`;
+  const hint = getCollegeHint(rank.mid, stream);
+  document.getElementById('pred-college-hint').textContent = hint;
+  document.getElementById('pred-result').style.display = 'block';
+}
+
+function getCollegeHint(rank, stream) {
+  if (stream==='MPC') {
+    if (rank<=500) return '🏆 JNTU Kakinada CSE / NIT Warangal possible!';
+    if (rank<=3000) return '🎓 JNTU Hyderabad, Andhra University top branches';
+    if (rank<=15000) return '🎓 Good govt. colleges — CSE/ECE branches possible';
+    if (rank<=50000) return '🏫 State govt. colleges — IT/EEE branches';
+    if (rank<=120000) return '🏫 Private colleges with scholarships';
+    return '📚 Keep practicing! Aim for 100+ score.';
+  } else {
+    if (rank<=500) return '🏆 SVMC Tirupati / Govt. Medical Colleges possible';
+    if (rank<=5000) return '🎓 Good govt. medical & pharma colleges';
+    if (rank<=20000) return '🏫 Private medical / pharma / biotech colleges';
+    return '📚 Keep practicing! Aim for 100+ score.';
+  }
+}
+
+// ─── ROUTINE ───
+function openRoutineModal() { openModal('routine-modal'); }
+
+function saveRoutine() {
+  const time=v('rt-time'), act=v('rt-act'), dur=v('rt-dur');
+  if (!time||!act) return alert('Time and Activity required.');
+  const routines = getRoutines();
+  routines.push({ id:Date.now(), time, act, dur:dur||'', date:new Date().toDateString() });
+  routines.sort((a,b)=>a.time.localeCompare(b.time));
+  saveRoutines(routines);
+  closeModal('routine-modal');
+  renderRoutineList();
+}
+
+function getRoutines() { return JSON.parse(localStorage.getItem(`sripa_routines_${currentUser.email}`) || '[]'); }
+function saveRoutines(r) { localStorage.setItem(`sripa_routines_${currentUser.email}`, JSON.stringify(r)); }
+
+function renderRoutineList() {
+  const all = getRoutines();
+  const today = new Date().toDateString();
+  const container = document.getElementById('routine-log-list');
+  if (!container) return;
+  const todayR = all.filter(r=>r.date===today);
+  if (!todayR.length) { container.innerHTML='<div style="text-align:center;color:var(--muted);padding:20px">No activities logged today.</div>'; return; }
+  container.innerHTML = todayR.map(r=>`
+    <div class="routine-slot">
+      <div class="slot-time">${r.time}</div>
+      <div class="slot-act">${r.act}${r.dur ? ` <span style="color:var(--muted);font-size:.75rem">(${r.dur} min)</span>` : ''}</div>
+      <button onclick="deleteRoutine(${r.id})" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:.9rem">🗑</button>
+    </div>`).join('');
+}
+
+function deleteRoutine(id) {
+  saveRoutines(getRoutines().filter(r=>r.id!==id));
+  renderRoutineList();
+}
+
+// ─── TIMETABLE ───
+const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+function openTimetableModal() {
+  const tt = getTimetable();
+  document.getElementById('tt-inputs').innerHTML = DAYS.map(d=>`
+    <div class="tt-row">
+      <div class="tt-day">${d}</div>
+      <input class="tt-subject" type="text" id="tt-${d}" placeholder="e.g. Physics Mock + Maths Revision" value="${tt[d]||''}">
+    </div>`).join('');
+  openModal('tt-modal');
+}
+
+function saveTimetable() {
+  const tt = {};
+  DAYS.forEach(d => { tt[d] = document.getElementById(`tt-${d}`)?.value || ''; });
+  localStorage.setItem(`sripa_tt_${currentUser.email}`, JSON.stringify(tt));
+  closeModal('tt-modal');
+  renderTimetableView();
+}
+
+function getTimetable() { return JSON.parse(localStorage.getItem(`sripa_tt_${currentUser.email}`) || '{}'); }
+
+function renderTimetableView() {
+  const tt = getTimetable();
+  const el = document.getElementById('tt-list');
+  if (!el) return;
+  const hasAny = DAYS.some(d=>tt[d]);
+  if (!hasAny) { el.innerHTML='<div style="color:var(--muted);font-size:.85rem">No timetable set. Click Edit Timetable.</div>'; return; }
+  el.innerHTML = DAYS.map(d=>`
+    <div class="tt-row">
+      <div class="tt-day">${d}</div>
+      <div style="flex:1;font-size:.85rem">${tt[d]||'<span style="color:var(--muted)">—</span>'}</div>
+    </div>`).join('');
+}
+
+// ─── REASONS ───
+function saveReason() {
+  const text = document.getElementById('reason-text').value.trim();
+  if (!text) return alert('Please enter a reason.');
+  const reasons = JSON.parse(localStorage.getItem(`sripa_reasons_${currentUser.email}`) || '[]');
+  reasons.unshift({ date:new Date().toDateString(), text, ts:Date.now() });
+  localStorage.setItem(`sripa_reasons_${currentUser.email}`, JSON.stringify(reasons));
+  closeModal('reason-modal');
+  renderReasonsLog();
+  alert('Reason saved ✅');
+}
+
+function renderReasonsLog() {
+  const reasons = JSON.parse(localStorage.getItem(`sripa_reasons_${currentUser.email}`) || '[]');
+  const el = document.getElementById('reasons-list');
+  if (!el) return;
+  if (!reasons.length) { el.innerHTML='<div style="text-align:center;color:var(--muted);padding:20px">No missed day reasons.</div>'; return; }
+  el.innerHTML = reasons.map(r=>`
+    <div style="padding:10px 0;border-bottom:1px solid rgba(30,58,95,.4)">
+      <div style="font-size:.75rem;color:var(--warn);margin-bottom:4px">${r.date}</div>
+      <div style="font-size:.88rem">${r.text}</div>
+    </div>`).join('');
+}
+
+// ─── SCORE HISTORY ───
+function renderScoreHistory() {
+  const exams = getExams();
+  const el = document.getElementById('score-history-list');
+  if (!el) return;
+  if (!exams.length) { el.innerHTML='<div style="text-align:center;color:var(--muted);padding:20px">No history yet.</div>'; return; }
+  const last20 = exams.slice(0,20);
+  el.innerHTML = last20.map(e=>{
+    const pct = Math.round((e.score/160)*100);
+    const col = pct>=70?'var(--accent3)':pct>=50?'var(--warn)':'var(--danger)';
+    const rank = calcRank(e.score, e.stream||'MPC');
+    return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(30,58,95,.3)">
+      <div style="font-family:var(--font-head);font-size:1.2rem;font-weight:700;color:${col};min-width:44px">${e.score}</div>
+      <div style="flex:1">
+        <div style="font-size:.85rem">${e.name}</div>
+        <div style="font-size:.72rem;color:var(--muted)">${new Date(e.datetime).toLocaleDateString()} · Rank ~${formatRank(rank.mid)}</div>
+      </div>
+      <div style="text-align:right;font-size:.75rem;color:${col}">${pct}%</div>
+    </div>`;
+  }).join('');
+}
+
+// ─── HOME REFRESH ───
+function refreshHome() {
+  const today = new Date().toDateString();
+  const exams = getExams().filter(e => new Date(e.datetime).toDateString() === today);
+  document.getElementById('today-exams').textContent = exams.length;
+  const pct = Math.min(100, (exams.length/2)*100);
+  document.getElementById('today-prog').style.width = pct + '%';
+  const avg = exams.length ? Math.round(exams.reduce((s,e)=>s+e.score,0)/exams.length) : null;
+  document.getElementById('today-avg').textContent = avg !== null ? avg : '—';
+
+  const allExams = getExams();
+  document.getElementById('total-exams').textContent = allExams.length;
+  document.getElementById('best-score').textContent = allExams.length ? Math.max(...allExams.map(e=>e.score)) : 0;
+  const absents = JSON.parse(localStorage.getItem(`sripa_absents_${currentUser.email}`) || '[]');
+  document.getElementById('absent-count').textContent = absents.length;
+  document.getElementById('streak-count').textContent = calcStreak();
+
+  // Rank from latest exam
+  if (allExams.length) {
+    const latest = allExams[0];
+    const rank = calcRank(latest.score, latest.stream||'MPC');
+    document.getElementById('rank-display').textContent = formatRank(rank.mid);
+    document.getElementById('rank-range').textContent = `Based on last test (${latest.score}/160) · Range: ${formatRank(rank.low)}–${formatRank(rank.high)}`;
+  }
+}
+
+function calcStreak() {
+  const exams = getExams();
+  if (!exams.length) return 0;
+  const dates = [...new Set(exams.map(e=>new Date(e.datetime).toDateString()))];
+  let streak = 0, d = new Date();
+  while (true) {
+    if (dates.includes(d.toDateString())) { streak++; d.setDate(d.getDate()-1); }
+    else break;
+  }
+  return streak;
+}
+
+// ─── NOTIFICATIONS ───
+function requestNotifPerms() {
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
+}
+
+function scheduleDailyChecks() {
+  checkReminders();
+  setInterval(checkReminders, 60000); // check every minute
+}
+
+function checkReminders() {
+  const now = new Date();
+  const hh = now.getHours(), mm = now.getMinutes();
+  const key9am = `sripa_notif_9am_${now.toDateString()}`;
+  const key9pm = `sripa_notif_9pm_${now.toDateString()}`;
+  const key10pm = `sripa_notif_10pm_${now.toDateString()}`;
+
+  if (hh===9 && mm===0 && !localStorage.getItem(key9am) && currentUser) {
+    localStorage.setItem(key9am,'1');
+    pushNotif('⏰ Sripa EAPCET Reminder', 'Good morning! Complete at least 2 practice exams (3 hours each) today. You can do it! 💪');
+  }
+  if (hh===21 && mm===0 && !localStorage.getItem(key9pm) && currentUser) {
+    localStorage.setItem(key9pm,'1');
+    const today = new Date().toDateString();
+    const exams = getExams().filter(e=>new Date(e.datetime).toDateString()===today);
+    if (exams.length < 2) {
+      pushNotif('⚠️ Sripa EAPCET Alert', `You've only done ${exams.length} exam(s) today. Target is 2. Please log your reason.`);
+      setTimeout(() => openModal('reason-modal'), 2000);
+    }
+  }
+  if (hh===22 && mm===0 && !localStorage.getItem(key10pm) && currentUser) {
+    localStorage.setItem(key10pm,'1');
+    sendGuardianReport(true);
+  }
+}
+
+function pushNotif(title, body) {
+  if ('Notification' in window && Notification.permission === 'granted') {
+    new Notification(title, { body, icon: '📚' });
+  }
+}
+
+// ─── EMAIL REPORT ───
+function sendGuardianReport(auto=false) {
+  const mailAlert = document.getElementById('mail-alert');
+  if (!currentUser) return;
+  const today = new Date().toDateString();
+  const exams = getExams().filter(e=>new Date(e.datetime).toDateString()===today);
+  const routines = getRoutines().filter(r=>r.date===today);
+  const reasons = JSON.parse(localStorage.getItem(`sripa_reasons_${currentUser.email}`) || '[]').filter(r=>r.date===today);
+
+  const examText = exams.length
+    ? exams.map(e=>`• ${e.name}: ${e.score}/160 (${Math.round(e.score/160*100)}%) at ${new Date(e.datetime).toLocaleTimeString()}`).join('\n')
+    : 'No exams written today.';
+
+  const routineText = routines.length
+    ? routines.map(r=>`• ${r.time} – ${r.act}${r.dur ? ` (${r.dur} min)`:''}`).join('\n')
+    : 'No routine logged.';
+
+  const reasonText = reasons.length ? reasons.map(r=>r.text).join('; ') : '';
+
+  let latestRank = '—';
+  const allExams = getExams();
+  if (allExams.length) {
+    const r = calcRank(allExams[0].score, allExams[0].stream||'MPC');
+    latestRank = `~${formatRank(r.mid)} (Range: ${formatRank(r.low)}–${formatRank(r.high)})`;
+  }
+
+  const message = `
+AP EAPCET Daily Report — ${today}
+Student: ${currentUser.name}
+Gmail: ${currentUser.email}
+
+📝 EXAMS TODAY (${exams.length}/2 target):
+${examText}
+
+📈 LATEST PREDICTED RANK: ${latestRank}
+
+📋 DAILY ROUTINE:
+${routineText}
+
+${reasonText ? `⚠️ MISSED EXAM REASON: ${reasonText}` : ''}
+
+Sent by Sripa AP EAPCET Monitoring App.
+`.trim();
+
+  emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+    to_email: currentUser.gemail,
+    to_name: currentUser.gname,
+    from_name: currentUser.name,
+    message: message,
+    subject: `📚 AP EAPCET Daily Report - ${currentUser.name} - ${today}`
+  }).then(() => {
+    if (!auto && mailAlert) {
+      mailAlert.textContent = `✅ Report sent to ${currentUser.gemail} successfully!`;
+      mailAlert.className = 'alert success show';
+      setTimeout(()=>mailAlert.classList.remove('show'),5000);
+    }
+  }).catch(err => {
+    if (!auto && mailAlert) {
+      mailAlert.textContent = `⚠️ Could not send email. Check EmailJS config. Error: ${err.text}`;
+      mailAlert.className = 'alert error show';
+      setTimeout(()=>mailAlert.classList.remove('show'),6000);
+    }
+    console.error('EmailJS error:', err);
+  });
+}
+
+// ─── HELPERS ───
+function v(id) { return document.getElementById(id)?.value?.trim() || ''; }
+
+// ─── PWA SERVICE WORKER ───
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(reg => console.log('SW registered:', reg.scope))
+      .catch(err => console.log('SW error:', err));
+  });
+}
+</script>
+</body>
+</html>
